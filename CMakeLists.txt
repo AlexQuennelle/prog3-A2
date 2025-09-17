@@ -98,7 +98,7 @@ target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES} )
 target_link_libraries(${PROJECT_NAME} raylib)
 
 target_include_directories(
-    "${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Include/"
+    "${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/"
 )
 target_include_directories(
     "${CMAKE_PROJECT_NAME}" PUBLIC "${PROJECT_BINARY_DIR}"
