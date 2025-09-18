@@ -6,10 +6,6 @@
 namespace wig
 {
 
-Button::Button(Vector2 pos, Vector2 size, Color base, Color hover,
-			   Color pressed)
-	: iWidget(pos, size), base(base), hover(hover), pressed(pressed)
-{}
 void Button::Draw()
 {
 	auto mousePos{GetMousePosition()};
@@ -24,20 +20,28 @@ void Button::Draw()
 			state = !state;
 	}
 	if (this->state)
-		DrawRectangleV(this->position, this->size, this->pressed);
+		DrawRectangleV(this->position, this->size, this->pressedCol);
 	else
 	{
 		if (mouseH && mouseV)
-			DrawRectangleV(this->position, this->size, this->hover);
+			DrawRectangleV(this->position, this->size, this->hoverCol);
 		else
-			DrawRectangleV(this->position, this->size, this->base);
+			DrawRectangleV(this->position, this->size, this->baseCol);
 	}
+}
+void TextButton::Draw()
+{
+	Button::Draw();
+	DrawText(this->text.c_str(), static_cast<int>(this->position.x),
+			 static_cast<int>(this->position.y), 30, BLACK);
 }
 
 WidgetProgram::WidgetProgram()
 {
-	this->widgets.push_back(
-		std::make_unique<Button>(Button({0.0f, 0.0f}, {200.0f, 150.0f})));
+	this->widgets.push_back(std::make_unique<TextButton>(
+		TextButton({50.0f, 25.0f}, {200.0f, 100.0f}, "test")));
+	//this->widgets.push_back(
+	//	std::make_unique<Button>(Button({50.0f, 25.0f}, {200.0f, 100.0f})));
 }
 void WidgetProgram::Update()
 {
