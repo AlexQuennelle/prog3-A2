@@ -3,6 +3,7 @@
 #include <memory>
 #include <raylib.h>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace wig
@@ -49,13 +50,30 @@ class TextButton : public Button
 	public:
 	TextButton(Vector2 pos, Vector2 size, std::string text, Color base = BROWN,
 			   Color hover = RED, Color pressed = GREEN)
-		: Button(pos, size, base, hover, pressed), text(text) {};
+		: Button(pos, size, base, hover, pressed), text(std::move(text)) {};
 
 	~TextButton() override = default;
 
 	void Draw() override;
 
 	private:
+	std::string text;
+};
+
+class TextInput : public iWidget
+{
+	public:
+	TextInput(Vector2 pos, Vector2 size,
+			  std::string placeholder = "Input text Here")
+		: iWidget(pos, size), placeHolderText(std::move(placeholder)) {};
+
+	~TextInput() override = default;
+
+	void Draw() override;
+
+	private:
+	bool focused{false};
+	const std::string placeHolderText;
 	std::string text;
 };
 
