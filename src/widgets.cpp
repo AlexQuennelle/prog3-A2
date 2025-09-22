@@ -4,6 +4,9 @@
 #include <iostream>
 #include <memory>
 #include <raylib.h>
+#include <string>
+#include <string_view>
+#include <vector>
 
 namespace wig
 {
@@ -97,8 +100,59 @@ void TextInput::Draw()
 			key = GetCharPressed();
 		}
 	}
-	DrawText(this->text.c_str(), static_cast<int>(this->position.x) + 2,
-			 static_cast<int>(this->position.y), 30.0f, BLACK);
+	this->ProcessText();
+	//DrawRectangleV(this->position + this->cursorPos, {8.0f,30.0f}, GRAY);
+}
+void TextInput::ProcessText()
+{
+	std::vector<std::string> lines{};
+	int lineStart{0};
+	int fontSize{30};
+	std::string line{""};
+	for (int i{0}; i < this->text.length(); i++)
+	{
+		if (this->text[i] == '\n')
+		{
+			lines.push_back(line);
+			line = "";
+			continue;
+		}
+		line.push_back(this->text[i]);
+		if (MeasureText(line.c_str(), fontSize) + 2.0f >= this->size.x)
+		{
+			line.pop_back();
+			lines.push_back(line);
+			line = "";
+			line.push_back(this->text[i]);
+		}
+	}
+	lines.push_back(line);
+	cursorPos.x = MeasureText(lines.end()->c_str(), fontSize);
+	int lineCount{
+		(static_cast<int>(this->size.y) + 2) /
+		static_cast<int>(MeasureTextEx(GetFontDefault(), " ", fontSize, 0).y)};
+	if (lines.size() < lineCount)
+	{
+		for (int i{0}; i < lines.size(); i++)
+		{
+			DrawText(lines[i].c_str(), static_cast<int>(this->position.x) + 2,
+					 static_cast<int>(this->position.y + i * fontSize),
+					 fontSize, BLACK);
+		}
+		cursorPos.y = lines.size() * fontSize;
+	}
+	else
+	{
+		for (int i{lineCount - 1}; i >= 0; i--)
+		{
+			int offset{static_cast<int>(lines.size() - lineCount)};
+			DrawText(lines[i + offset].c_str(),
+					 static_cast<int>(this->position.x) + 2,
+					 static_cast<int>(this->position.y + i * fontSize),
+					 fontSize, BLACK);
+		}
+		cursorPos.y = (lineCount - 1) * fontSize;
+	}
 }
 
 WidgetProgram::WidgetProgram()

@@ -11,12 +11,12 @@ namespace wig
 
 using std::vector;
 
-class iWidget
+class WidgetBase
 {
 	public:
-	iWidget(Vector2 pos, Vector2 size) : position(pos), size(size) {};
+	WidgetBase(Vector2 pos, Vector2 size) : position(pos), size(size) {};
 
-	virtual ~iWidget() = default;
+	virtual ~WidgetBase() = default;
 
 	virtual void Draw() = 0;
 
@@ -24,14 +24,14 @@ class iWidget
 	Vector2 position;
 	Vector2 size;
 };
-using Widget = std::unique_ptr<iWidget>;
+using Widget = std::unique_ptr<WidgetBase>;
 
-class Button : public iWidget
+class Button : public WidgetBase
 {
 	public:
 	Button(Vector2 pos, Vector2 size, Color base = BROWN, Color hover = RED,
 		   Color pressed = GREEN)
-		: iWidget(pos, size), baseCol(base), hoverCol(hover),
+		: WidgetBase(pos, size), baseCol(base), hoverCol(hover),
 		  pressedCol(pressed)
 	{}
 
@@ -60,12 +60,12 @@ class TextButton : public Button
 	std::string text;
 };
 
-class TextInput : public iWidget
+class TextInput : public WidgetBase
 {
 	public:
 	TextInput(Vector2 pos, Vector2 size,
 			  std::string placeholder = "Input text Here")
-		: iWidget(pos, size), placeHolderText(std::move(placeholder)) {};
+		: WidgetBase(pos, size), placeHolderText(std::move(placeholder)) {};
 
 	~TextInput() override = default;
 
@@ -73,8 +73,11 @@ class TextInput : public iWidget
 
 	private:
 	bool focused{false};
+	Vector2 cursorPos{};
 	const std::string placeHolderText;
 	std::string text;
+
+	void ProcessText();
 };
 
 class WidgetProgram
