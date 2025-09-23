@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <raylib.h>
+#include <raymath.h>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -87,21 +88,35 @@ void TextInput::Draw()
 	else
 	{
 		int key = GetCharPressed();
-		while (key > 0)
+		//std::cout << GetKeyPressed() << '\n';
+		if (GetKeyPressed() == KEY_BACKSPACE && this->text.length() > 0)
 		{
-			if (static_cast<char>(key) == '\b')
-			{
-				this->text.pop_back();
-			}
-			else if (key >= 32 && key <= 125)
-			{
-				this->text.push_back(static_cast<char>(key));
-			}
-			key = GetCharPressed();
+			this->text.pop_back();
 		}
+		else if (GetKeyPressed() == KEY_ENTER)
+		{
+			std::cout << "Enter\n";
+			this->text.push_back('\n');
+		}
+		else
+		{
+			while (key > 0)
+			{
+				if (static_cast<char>(key) == '\b')
+				{
+					//this->text.pop_back();
+				}
+				else if (key >= 32 && key <= 125)
+				{
+					this->text.push_back(static_cast<char>(key));
+				}
+				key = GetCharPressed();
+			}
+		}
+		//std::cout << this->text << '\n';
+		DrawRectangleV(this->position + this->cursorPos, {3.0f, 30.0f}, GRAY);
 	}
 	this->ProcessText();
-	//DrawRectangleV(this->position + this->cursorPos, {8.0f,30.0f}, GRAY);
 }
 void TextInput::ProcessText()
 {
@@ -127,7 +142,10 @@ void TextInput::ProcessText()
 		}
 	}
 	lines.push_back(line);
-	cursorPos.x = MeasureText(lines.end()->c_str(), fontSize);
+	this->cursorPos = {.x = static_cast<float>(MeasureText(
+								lines[lines.size() - 1].c_str(), fontSize)) +
+							2.0f,
+					   .y = cursorPos.y};
 	int lineCount{
 		(static_cast<int>(this->size.y) + 2) /
 		static_cast<int>(MeasureTextEx(GetFontDefault(), " ", fontSize, 0).y)};
@@ -139,7 +157,9 @@ void TextInput::ProcessText()
 					 static_cast<int>(this->position.y + i * fontSize),
 					 fontSize, BLACK);
 		}
-		cursorPos.y = lines.size() * fontSize;
+		this->cursorPos = {
+			.x = cursorPos.x,
+			.y = (static_cast<float>(lines.size() - 1) * fontSize)};
 	}
 	else
 	{
@@ -151,9 +171,10 @@ void TextInput::ProcessText()
 					 static_cast<int>(this->position.y + i * fontSize),
 					 fontSize, BLACK);
 		}
-		cursorPos.y = (lineCount - 1) * fontSize;
+		this->cursorPos = {.x = cursorPos.x,
+						   .y = static_cast<float>((lineCount - 1) * fontSize)};
 	}
-}
+} //namespace wig
 
 WidgetProgram::WidgetProgram()
 {
