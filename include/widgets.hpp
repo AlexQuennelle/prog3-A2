@@ -11,6 +11,10 @@ namespace wig
 
 using std::vector;
 
+/**
+ * Base widget class to inherit from. Provides some common properties and a
+ * Draw() method to be overridden.
+ */
 class WidgetBase
 {
 	public:
@@ -18,14 +22,17 @@ class WidgetBase
 
 	virtual ~WidgetBase() = default;
 
+	/** Draws the widget to the canvas. */
 	virtual void Draw() = 0;
 
 	protected:
 	Vector2 position;
 	Vector2 size;
 };
+/** Alias for a pointer to WidgetBase for less typing and better readability. */
 using Widget = std::unique_ptr<WidgetBase>;
 
+/** Simple toggleable button widget. */
 class Button : public WidgetBase
 {
 	public:
@@ -45,6 +52,7 @@ class Button : public WidgetBase
 	Color hoverCol;
 	Color pressedCol;
 };
+/** Toggleable button widget with a text label. */
 class TextButton : public Button
 {
 	public:
@@ -60,11 +68,13 @@ class TextButton : public Button
 	std::string text;
 };
 
+/** Text input box widget. Input text wraps on horizontal overflow and scrolls
+ * on vertical overflow. */
 class TextInput : public WidgetBase
 {
 	public:
 	TextInput(Vector2 pos, Vector2 size,
-			  std::string placeholder = "Input text Here")
+			  std::string placeholder = "Input text here")
 		: WidgetBase(pos, size), placeHolderText(std::move(placeholder)) {};
 
 	~TextInput() override = default;
@@ -77,14 +87,21 @@ class TextInput : public WidgetBase
 	const std::string placeHolderText;
 	std::string text;
 
+	/**
+	 * Processes and draws the stored text to the screen. This function handles
+	 * wrapping and scrolling the text by splitting it on overflow and storing
+	 * the new strings in a vector.
+	 */
 	void ProcessText();
 };
 
+/** Class that represents an instance of the widget demo program. */
 class WidgetProgram
 {
 	public:
 	WidgetProgram();
 
+	/** The main program loop. */
 	void Update();
 
 	private:
